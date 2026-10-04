@@ -5,8 +5,6 @@
 
 </div>
 
----
-
 ## ✨ Why this isn't "just another RAG chatbot"
 
 Most RAG demos retrieve a few chunks and hope for the best. This copilot is an **agentic workflow** built on LangGraph that *decides* what to do at each step:
@@ -100,52 +98,6 @@ Enterprice_RAG_Copilot/
 ├── ingest_sample_kb.py       # One-shot script to index the sample KB
 ├── run.py                    # Dev server entry point
 └── requirements.txt
-```
-
----
-
-## 🚀 Getting started
-
-### 1. Prerequisites
-
-- **Python 3.10+**
-- API keys for **[OpenAI](https://platform.openai.com/api-keys)**, **[Pinecone](https://app.pinecone.io/)** and **[Tavily](https://app.tavily.com/)**
-
-### 2. Clone and install
-
-```bash
-git clone https://github.com/MuteebMMN/Enterprice_RAG_Copilot.git
-cd Enterprice_RAG_Copilot
-
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# macOS / Linux
-source .venv/bin/activate
-
-pip install -r requirements.txt
-```
-
-### 3. Configure environment
-
-Create a `.env` file in the project root:
-
-```env
-# Required
-OPENAI_API_KEY=sk-...
-PINECONE_API_KEY=pcsk_...
-TAVILY_API_KEY=tvly-...
-
-# Protects the document upload endpoint — change this!
-ADMIN_API_KEY=your-strong-secret
-
-# Optional (defaults shown)
-OPENAI_MODEL=gpt-4o-mini
-EMBEDDING_MODEL=text-embedding-3-small
-PINECONE_INDEX_NAME=fde-it-support-rag
-PINECONE_NAMESPACE=company-it-kb
-TOP_K=4
-MAX_RETRIES=1
 ```
 
 > ⚠️ **Variable names must match exactly.** Any variable the app doesn't recognize is silently ignored and the default is used instead. Also note it's `gpt-4o-mini` with the **letter o**, not `gpt-40-mini`.
@@ -263,26 +215,7 @@ sqlite3 data/audit.db "SELECT created_at, source_used, question FROM query_audit
 
 ---
 
-## 🗺️ Roadmap
 
-- [ ] Streaming responses
-- [ ] Conversation memory / multi-turn context
-- [ ] Docker & docker-compose setup
-- [ ] Automated tests and evaluation suite (RAGAS)
-- [ ] Role-based access to KB namespaces
-- [ ] Admin dashboard for the audit log
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Fork the repo, create a feature branch, and open a pull request.
-
----
-
-<div align="center">
-
-Built by **[Muteeb Nasir](https://github.com/MuteebMMN)**
 
 ⭐ If you find this useful, give it a star!
 
