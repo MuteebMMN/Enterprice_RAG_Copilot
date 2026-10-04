@@ -2,14 +2,6 @@
 
 # 🛠️ Enterprise IT Support — Agentic RAG Copilot
 
-**An IT help-desk assistant that answers from your company's private knowledge base, grades its own evidence, falls back to the web when needed, and shows its reasoning at every step.**
-
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.116-009688?logo=fastapi&logoColor=white)
-![LangGraph](https://img.shields.io/badge/LangGraph-1.1-1C3C3C?logo=langchain&logoColor=white)
-![OpenAI](https://img.shields.io/badge/OpenAI-gpt--4o--mini-412991?logo=openai&logoColor=white)
-![Pinecone](https://img.shields.io/badge/Pinecone-Vector%20DB-000000)
-![Tavily](https://img.shields.io/badge/Tavily-Web%20Search-5A67D8)
 
 </div>
 
