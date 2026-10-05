@@ -9,7 +9,7 @@ from app.core.config import get_settings, BASE_DIR
 from app.core.deps import CurrentUser, get_current_user
 from app.core.logging import configure_logging
 from app.db.hr import get_hr_repo
-from app.db.users import init_users_db
+from app.db.users import get_user_by_email, init_users_db
 from app.services.audit import init_db
 
 
@@ -45,6 +45,16 @@ def profile(user: CurrentUser) -> dict:
     }
 
 
+def demo_profile() -> dict | None:
+    """Details for the 'Continue as demo user' button, or None when demo login is off."""
+    if not settings.demo_email:
+        return None
+    user = get_user_by_email(settings.demo_email)
+    if user is None or not user.active or user.role != "employee":
+        return None
+    return profile(CurrentUser(id=user.id, email=user.email, role=user.role, employee_id=user.employee_id))
+
+
 def page(request: Request, template: str, **context):
     # no-store: after logout, the browser's back button must not show a cached private page
     response = templates.TemplateResponse(
@@ -66,7 +76,7 @@ def home(request: Request):
 def login_page(request: Request):
     if current_user_or_none(request) is not None:
         return RedirectResponse("/", status_code=303)
-    return page(request, "login.html")
+    return page(request, "login.html", demo=demo_profile())
 
 
 @app.get("/admin", response_class=HTMLResponse)

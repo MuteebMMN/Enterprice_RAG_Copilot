@@ -22,6 +22,18 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=256)
 
 
+def _start_session(response: Response, user) -> None:
+    response.set_cookie(
+        COOKIE_NAME,
+        create_access_token(user.id, user.role),
+        httponly=True,
+        samesite="lax",
+        secure=settings.cookie_secure,
+        max_age=settings.jwt_expire_minutes * 60,
+        path="/",
+    )
+
+
 @router.post("/login")
 def login(payload: LoginRequest, response: Response):
     user = get_user_by_email(payload.email)
@@ -41,15 +53,18 @@ def login(payload: LoginRequest, response: Response):
         raise HTTPException(status_code=401, detail=INVALID_LOGIN)
 
     register_successful_login(user.id)
-    response.set_cookie(
-        COOKIE_NAME,
-        create_access_token(user.id, user.role),
-        httponly=True,
-        samesite="lax",
-        secure=settings.cookie_secure,
-        max_age=settings.jwt_expire_minutes * 60,
-        path="/",
-    )
+    _start_session(response, user)
+    return {"message": "Logged in"}
+
+
+@router.post("/demo-login")
+def demo_login(response: Response):
+    """One-click sign-in for the public demo account. Off unless DEMO_EMAIL is set."""
+    user = get_user_by_email(settings.demo_email) if settings.demo_email else None
+    # Only ever an ordinary employee, so a misconfiguration can never expose HR/admin powers.
+    if user is None or not user.active or user.role != "employee":
+        raise HTTPException(status_code=404, detail="Demo login is not available")
+    _start_session(response, user)
     return {"message": "Logged in"}
 
 

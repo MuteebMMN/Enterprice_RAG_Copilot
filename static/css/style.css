@@ -40,3 +40,7 @@
 .badge-block{background:#4a2029;color:#ffb0b0}
 .actions{white-space:nowrap}
 .small-btn{padding:6px 10px;font-size:12px;margin-right:6px}
+.demo-box{margin-top:22px}
+.demo-divider{display:flex;align-items:center;gap:12px;color:#657184;font-size:12px;margin-bottom:14px}
+.demo-divider::before,.demo-divider::after{content:"";flex:1;height:1px;background:#202936}
+.demo-box p{margin:10px 0 0}

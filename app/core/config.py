@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     jwt_secret: str
     jwt_expire_minutes: int = 60
     cookie_secure: bool = False
+    demo_email: str = ""
     hr_db_path: str = str(BASE_DIR / "data" / "hr.db")
     app_db_path: str = str(BASE_DIR / "data" / "app.db")
     audit_db_path: str = str(BASE_DIR / "data" / "audit.db")
