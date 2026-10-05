@@ -1,9 +1,10 @@
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, HTTPException, Header
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
+from app.core.deps import CurrentUser, get_current_user, require_role
 from pydantic import BaseModel, Field
 from app.core.config import get_settings
 from app.rag.workflow import ask
-from app.rag.vectorstore import add_documents 
+from app.rag.vectorstore import add_documents, VISIBILITIES
 from app.services.ingestion import load_file, chunk_documents, SUPPORTED
 from app.services.audit import write_audit
 
@@ -16,10 +17,10 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/chat")
-def chat(payload: ChatRequest):
+def chat(payload: ChatRequest, user: CurrentUser = Depends(get_current_user)):
     try:
-        result = ask(payload.question)
-        write_audit(payload.question, result["source_used"], result.get("trace", []))
+        result = ask(payload.question, user)
+        write_audit(payload.question, result["source_used"], result.get("trace", []), user, result.get("guardrail"))
 
         return {
             "answer": result["answer"],
@@ -36,17 +37,21 @@ def chat(payload: ChatRequest):
 
 
 @router.post("/ingest")
-async def ingest(file: UploadFile = File(...), x_admin_key: str = Header(default="")):
-    if x_admin_key != settings.admin_api_key:
-        raise HTTPException(status_code=401, detail="Invalid admin key")
+def ingest(
+    file: UploadFile = File(...),
+    visibility: str = Form("all"),
+    user: CurrentUser = Depends(require_role("admin")),
+):
+    if visibility not in VISIBILITIES:
+        raise HTTPException(status_code=400, detail=f"visibility must be one of: {', '.join(VISIBILITIES)}")
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in SUPPORTED:
         raise HTTPException(status_code=400, detail=f"Supported: {', '.join(sorted(SUPPORTED))}")
     upload_dir = Path(settings.upload_dir)
     upload_dir.mkdir(parents=True, exist_ok=True)
     dest = upload_dir / Path(file.filename).name
-    dest.write_bytes(await file.read())
+    dest.write_bytes(file.file.read())
     docs = load_file(dest)
     chunks = chunk_documents(docs)
-    ids = add_documents(chunks)
-    return {"message": "Document indexed", "file": dest.name, "chunks": len(chunks), "ids_created": len(ids)}
+    ids = add_documents(chunks, visibility)
+    return {"message": "Document indexed", "file": dest.name, "visibility": visibility, "chunks": len(chunks), "ids_created": len(ids)}

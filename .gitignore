@@ -222,3 +222,7 @@ __marimo__/
 # App runtime data
 uploads/
 data/audit.db
+
+# Local databases (contain employee data)
+data/hr.db
+data/app.db

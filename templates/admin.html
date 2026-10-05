@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · {{ app_name }}</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body data-role="{{ user.role }}">
+  <div class="admin-wrap">
+    <header class="admin-head">
+      <div>
+        <div class="brand-badge">FDE Project</div>
+        <h1>Admin &amp; audit</h1>
+        <p class="muted">Signed in as {{ user.name }} · <span class="role-tag">{{ user.role }}</span></p>
+      </div>
+      <div class="admin-head-actions">
+        <a class="secondary-btn link-btn" href="/">← Back to chat</a>
+        <button id="logoutBtn" class="secondary-btn">Sign out</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="audit">Audit log</button>
+      <button class="tab admin-only hidden" data-tab="users">Accounts</button>
+    </nav>
+
+    <section id="tab-audit" class="tab-panel">
+      <div class="toolbar">
+        <label class="check"><input type="checkbox" id="blockedOnly" /> Blocked attempts only</label>
+        <button id="refreshAudit" class="secondary-btn">Refresh</button>
+        <span id="auditCount" class="muted small"></span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Time (UTC)</th><th>User</th><th>Question</th><th>Outcome</th><th>Trace</th></tr></thead>
+          <tbody id="auditBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-users" class="tab-panel hidden">
+      <form id="newUserForm" class="toolbar">
+        <input id="nuEmployee" placeholder="Employee ID (e.g. E017)" required />
+        <select id="nuRole"><option value="employee">employee</option><option value="hr">hr</option><option value="admin">admin</option></select>
+        <input id="nuPassword" type="password" placeholder="Temporary password (min 8)" required autocomplete="new-password" />
+        <button class="send-btn" type="submit">Create account</button>
+        <span id="userMsg" class="small"></span>
+      </form>
+      <p class="muted small">The employee must already exist in the HR database; the account email is taken from their HR record.</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Email</th><th>Employee</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <script src="/static/js/admin.js"></script>
+</body>
+</html>

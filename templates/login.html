@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in · {{ app_name }}</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-card">
+    <div class="brand-badge">FDE Project</div>
+    <h1>Sign in</h1>
+    <p class="muted">Use your company email to reach the IT Support Copilot. You can only see your own employee information.</p>
+    <form id="loginForm" class="auth-form" autocomplete="on">
+      <label for="email">Company email</label>
+      <input id="email" name="email" type="email" autocomplete="username" required autofocus />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button id="loginBtn" type="submit" class="send-btn full">Sign in</button>
+      <div id="loginError" class="form-error" role="alert"></div>
+    </form>
+  </main>
+  <script src="/static/js/login.js"></script>
+</body>
+</html>

@@ -1,4 +1,6 @@
+import hashlib
 import time
+from pathlib import Path
 from pinecone import Pinecone , ServerlessSpec
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
@@ -73,9 +75,12 @@ def ensure_index():
             current_dimension = index_info.get("dimension")
 
         if current_dimension is not None and current_dimension != desired_dimension:
-            pc.delete_index(name=settings.pinecone_index_name)
-            while settings.pinecone_index_name in [x["name"] for x in pc.list_indexes()]:
-                time.sleep(1)
+            raise RuntimeError(
+                f"Pinecone index '{settings.pinecone_index_name}' has dimension {current_dimension}, "
+                f"but embedding model '{settings.embedding_model}' needs {desired_dimension}. "
+                "Fix EMBEDDING_MODEL, or point PINECONE_INDEX_NAME at a new index. "
+                "Delete the old index manually in the Pinecone console if you really want to rebuild it."
+            )
 
     if settings.pinecone_index_name not in [x["name"] for x in pc.list_indexes()]:
         pc.create_index(
@@ -106,11 +111,31 @@ def get_vectorstore():
 
 
 
-def get_retriever():
-    return get_vectorstore().as_retriever(search_kwargs={"k": settings.top_k})
+VISIBILITIES = ("all", "hr")
 
 
+def visible_levels(role: str) -> list[str]:
+    """Document visibility levels a role may retrieve. Anything untagged is visible to nobody."""
+    return ["all", "hr"] if role in ("hr", "admin") else ["all"]
 
-def add_documents(chunks):
+
+def get_retriever(role: str = "employee"):
+    return get_vectorstore().as_retriever(
+        search_kwargs={"k": settings.top_k, "filter": {"visibility": {"$in": visible_levels(role)}}}
+    )
+
+
+def _chunk_id(doc) -> str:
+    name = Path(doc.metadata.get("source", "unknown")).name
+    start = doc.metadata.get("start_index", 0)
+    page = doc.metadata.get("page", 0)
+    return hashlib.sha1(f"{name}:{page}:{start}".encode()).hexdigest()
+
+def add_documents(chunks, visibility: str = "all"):
+    if visibility not in VISIBILITIES:
+        raise ValueError(f"visibility must be one of {VISIBILITIES}")
+    for c in chunks:
+        c.metadata["visibility"] = visibility
     store = get_vectorstore()
-    return store.add_documents(chunks)
+    ids = [_chunk_id(c) for c in chunks]
+    return store.add_documents(chunks, ids=ids)
