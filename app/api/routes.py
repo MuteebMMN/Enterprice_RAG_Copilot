@@ -1,6 +1,7 @@
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
-from app.core.deps import CurrentUser, get_current_user, require_role
+from app.core.deps import CurrentUser, require_role
+from app.core.ratelimit import chat_rate_limit
 from pydantic import BaseModel, Field
 from app.core.config import get_settings
 from app.rag.workflow import ask
@@ -17,7 +18,7 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/chat")
-def chat(payload: ChatRequest, user: CurrentUser = Depends(get_current_user)):
+def chat(payload: ChatRequest, user: CurrentUser = Depends(chat_rate_limit)):
     try:
         result = ask(payload.question, user)
         write_audit(payload.question, result["source_used"], result.get("trace", []), user, result.get("guardrail"))

@@ -22,4 +22,5 @@ else
     python scripts/seed_users.py
 fi
 
-exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8080}"
+# --proxy-headers: the app sits behind Caddy, so read the real client IP (used by the rate limit)
+exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8080}" --proxy-headers --forwarded-allow-ips "*"
