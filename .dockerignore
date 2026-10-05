@@ -1,0 +1,18 @@
+# Secrets and local data must never be baked into the image
+.env
+.env.*
+data/*.db
+uploads/
+storage/
+
+# Not needed at runtime
+.git
+.gitignore
+.vscode
+.claude
+__pycache__/
+*.py[cod]
+tests/
+README.md
+Dockerfile
+.dockerignore

@@ -49,6 +49,10 @@ def main() -> None:
     if not created:
         print("All employees already have accounts.")
         return
+    if args.password:
+        # Never echo a password the caller supplied (it would end up in logs).
+        print(f"Created {len(created)} accounts with the password you supplied.")
+        return
     print(f"Created {len(created)} accounts. Passwords are shown ONCE:\n")
     for email, role, password in created:
         print(f"{role:9} {email:36} {password}")

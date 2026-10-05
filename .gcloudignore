@@ -1,0 +1,14 @@
+# Used by `gcloud run deploy --source .` — keeps secrets and local data out of the upload
+.gcloudignore
+.git
+.gitignore
+.env
+.env.*
+data/*.db
+uploads/
+storage/
+.vscode
+.claude
+__pycache__/
+*.py[cod]
+tests/
